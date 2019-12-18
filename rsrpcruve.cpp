@@ -32,6 +32,7 @@ RsrpCruve::RsrpCruve(QWidget *parent)
 
     myLines.clear();
 
+	//画笔设置
     myBlackPen = QPen(Qt::black);
     myBlackPen.setWidth(2);
     myBlackPen.setStyle(Qt::SolidLine);
@@ -51,21 +52,16 @@ void RsrpCruve::updateCruve(CPIT230 newData)
 
 void RsrpCruve::updateCruve()
 {
+	//判断条件
     if(cpit230Data.bDataValidFlag)
     {
         if((cpit230Data.RSRP > -80) & (cpit230Data.RSRP != 0))
-        {
             cpit230Data.RSRP = -80;
-        }
         else if((cpit230Data.RSRP < -120) | (cpit230Data.RSRP == 0))
-        {
             cpit230Data.RSRP = -120;
-        }
     }
     else
-    {
         cpit230Data.RSRP = -120;
-    }
     listRSRP.prepend(cpit230Data.RSRP);
     listRSRP.removeLast();
     update();
@@ -81,7 +77,7 @@ void RsrpCruve::paintEvent(QPaintEvent *event)
     painter.save();
 
     painter.setPen(myBlackPen);
-    painter.translate(XORIG, (Y - YORIG));//50,30
+    painter.translate(XORIG, (Y - YORIG));//(50,30)坐标原点
 
     painter.drawLine(0, 0, (XLONG + XXLONGER), 0);//X轴
     painter.drawLine(XLONG + ARROWXWIDTH, -ARROWYWIDTH, (XLONG + XXLONGER), 0);//画上部分-箭头
@@ -91,7 +87,7 @@ void RsrpCruve::paintEvent(QPaintEvent *event)
     painter.drawLine(-ARROWXWIDTH, -(YLONG + ARROWYWIDTH), 0, -(YLONG + YYLONGER + ARROWYWIDTH));//左部分-箭头
     painter.drawLine(ARROWXWIDTH, -(YLONG + ARROWYWIDTH), 0, -(YLONG + YYLONGER + ARROWYWIDTH));//右部分-箭头
 
-    int xdPix = XLONG/XDIVI;//600/10=60
+    int xdPix = XLONG/XDIVI;// 600/10=60
     for(int i = 1; i <= XDIVI; i++)
         painter.drawLine(i*xdPix, 0, i*xdPix, -10);//画x轴的刻度
     int ydPix = YLONG/YDIVI;//360/8=20
@@ -100,26 +96,22 @@ void RsrpCruve::paintEvent(QPaintEvent *event)
 
     //完成X轴标尺数字的绘制
     for(int i = 0; i <= XDIVI; i++)
-    {
         painter.drawText((xdPix*i - 5), 20, QString::number(i));
-    }
 
     //完成Ｙ轴标尺数字的绘制
     int startP = YORIG - 25;//10
     for(int i = 0; i <= YDIVI; i++)
-    {
         painter.drawText(-TEXTWIDTH*5, -(ydPix*i - startP), QString::number(-120 + i*5));
-    }
 
     painter.drawText((XLONG + XXLONGER + 5), 5, QString(tr("t(s)")));
     painter.drawText(5, -(YLONG + 20), QString(tr("RSRP(dBm)")));
 
-    //drawThresholdLine
+    //draw ThresholdLine
     painter.setPen(myDashPen);
     int yValue = 5;
     painter.drawLine(0,((THRESHOLD - 120)*YLONG/yValue/YDIVI), XLONG, ((THRESHOLD - 120)*YLONG/yValue/YDIVI));
 
-    //drawallpointers
+    //draw all pointers
     painter.setPen(myRedPen);
     int xPosition = 0;
     int yPosition = 0;
